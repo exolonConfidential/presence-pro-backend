@@ -1,0 +1,99 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Year {
+  One
+  Two
+  Three
+  Four
+}
+
+enum Branch {
+  electronics
+  information
+  computer
+  chemical
+  biotech
+}
+
+model Students {
+   id      String     @id @default(uuid())
+   name    String
+   year    Year      @default(Four)
+   branch  Branch    @default(electronics)
+   rollNo  String       @unique
+   password   String?
+   enrolled   Boolean   @default(false)
+   fingerprintId    String?   @unique
+   attendances   Attendances[]
+}
+
+model Admins {
+  id      String     @id @default(uuid())
+  name    String
+  email   String?     @unique
+  password   String?
+}
+
+
+model Subjects {
+  id      String     @id @default(uuid())
+  name    String     
+  code    String     @unique
+  teacher   String?
+  createdAt  DateTime @default(now())
+  timetable  Timetable[]
+  attendance   Attendances[]
+}
+
+enum Days {
+  Monday
+  Tuesday
+  Wednesday
+  Thursday
+  Friday
+  Saturday
+}
+
+
+model Timetable {
+  id      String     @id @default(uuid())
+  year    Year       @default(Four)
+  day     Days       @default(Monday)
+  startTime   String
+  endTime     String
+  subjectCode   String
+  forSubject    Subjects  @relation(fields: [subjectCode], references: [code])
+  @@unique([day, startTime, endTime, year])
+}
+
+model Attendances {
+  id      String     @id @default(uuid())
+  studentId    String
+  subjectCode   String
+  
+  forSubject   Subjects    @relation(fields: [subjectCode],references: [code])
+  attendie  Students  @relation(fields: [studentId], references: [id])
+
+  timestamp   DateTime    @default(now())
+}
+
+model HardwareStatus {
+  id         String  @id @default(uuid())  
+  esp32Ip    String  
+  isOnline   Boolean @default(false)  
+  lastChecked DateTime @default(now())  
+  errorLogs  String?    
+}

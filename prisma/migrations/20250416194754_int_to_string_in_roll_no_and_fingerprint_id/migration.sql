@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Students" ALTER COLUMN "rollNo" SET DATA TYPE TEXT,
+ALTER COLUMN "fingerprintId" SET DATA TYPE TEXT;
