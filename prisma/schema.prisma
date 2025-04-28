@@ -36,6 +36,7 @@ model Students {
    rollNo  String       @unique
    password   String?
    enrolled   Boolean   @default(false)
+   isEnrolling    Boolean @default(false) 
    fingerprintId    String?   @unique
    attendances   Attendances[]
 }

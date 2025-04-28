@@ -137,28 +137,16 @@ router.put('/enroll',adminAuth, async (req, res) => {
     
       const student = await prisma.students.update({
         where: { rollNo},
-        data: { enrolled: true },
+        data: { isEnrolling: true , enrolled: false },
       });
       res.status(200).json(student);
     } catch (err) {
-     console.log(err)
+     
       res.status(500).json({ error: 'Enrollment failed' });
     }
   });
   
   
-router.put('/unenroll',adminAuth, async (req, res) => {
-    try {
-      const student = await prisma.students.update({
-        where: { rollNo: req.query.rollNo },
-        data: { enrolled: false },
-      });
-      res.status(200).json(student);
-    } catch (err) {
-      console.log(err)
-      res.status(500).json({ error: 'Unenrollment failed' });
-    }
-  });
-   
+
 
 export default router
