@@ -14,8 +14,6 @@ router.get('/pendingEnrollment', async (req, res) => {
           id: 'asc', 
         },
         select: {
-          id: true,
-          name: true,
           rollNo: true,
           fingerprintId: true,
         },
@@ -27,21 +25,22 @@ router.get('/pendingEnrollment', async (req, res) => {
   
       return res.status(200).json({
         pending: true,
-        student: pendingStudent,
+        rollNo: pendingStudent.rollNo,
+        fingerprintId: pendingStudent.fingerprintId
       });
     } catch (err) {
-      console.error(err);
+      
       return res.status(500).json({ error: 'Internal server error' });
     }
   });
   
   router.post('/enrollmentResult', async (req, res) => {
     try {
-      const { id, success } = req.body; 
+      const { rollNo, success } = req.body; 
   
       if (success) {
         await prisma.students.update({
-          where: { id },
+          where: { rollNo },
           data: {
             enrolled: true,
             isEnrolling: false,
@@ -58,7 +57,7 @@ router.get('/pendingEnrollment', async (req, res) => {
   
       return res.status(200).json({ msg: 'Updated successfully' });
     } catch (err) {
-      console.error(err);
+     
       return res.status(500).json({ error: 'Internal server error' });
     }
   });
