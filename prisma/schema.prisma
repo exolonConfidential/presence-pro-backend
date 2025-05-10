@@ -53,6 +53,7 @@ model Subjects {
   id      String     @id @default(uuid())
   name    String     
   code    String     @unique
+  year    Year       @default(Four)
   teacher   String?
   createdAt  DateTime @default(now())
   timetable  Timetable[]

@@ -44,22 +44,22 @@ router.delete("/remove", adminAuth, async(req,res)=>{
         res.status(500).json({ error: "Internal server error" })
     }
 })
-
+// nerver use uppercase while destructuring the headers it is always in lowecase
 router.post("/signin", async (req, res) => {
 
     try {
-        const { rollno, password } = req.body; // nerver use uppercase while destructuring the headers it is always in lowecase
+        const { rollNo, password } = req.body; 
         const jwtPassword = process.env.JWT_PASSWORD
 
         const student = await prisma.students.findUnique({
             where: {
-                rollNo: rollno
+                rollNo: rollNo
             }
         })
         if (!(student && student.password == password))  return res.status(401).json({ error: "Wrong Credentials" })
-        const rollNo = student.rollNo
+      
         const token = jwt.sign({ rollNo, role: "student" }, jwtPassword)
-        res.status(200).json({ msg: "Found successfully", student, token })
+        res.status(200).json({ msg: "Found successfully", rollNo: student.rollNo , token })
     } catch (error) {
 
         res.status(500).json({ error: "Internal server error" })
@@ -146,7 +146,37 @@ router.put('/enroll',adminAuth, async (req, res) => {
     }
   });
   
-  
+router.get("/studentHome",studentAuth,async (req,res)=>{
+    try {
+        const { rollNo } = req.query;
+        const student = await prisma.students.findUnique({
+            where: {
+                rollNo
+            },
+            select: {
+                name: true,
+                rollNo: true,
+                branch: true,
+                year: true
+            }
+        })
+        if(!student) return res.status(401).json({error: "Student not found"});
+        const subjects = await prisma.subjects.findMany({
+            where: {
+                year: student.year
+            },
+            select:{
+                name: true,
+                code: true,
+                year: true,
+                teacher: true
+            }
+        })
+        res.status(200).json({subjects, student})
+    } catch (error) {
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+})
 
 
 export default router
