@@ -76,7 +76,7 @@ router.post("/addSub", adminAuth, async (req, res) => {
     }
 
   } catch (err) {
-    console.log(err)
+    
     res.status(500).json({ error: "Internal server error" });
   }
 });
@@ -184,7 +184,7 @@ router.get("/timetable", adminAuth, async (req, res) => {
     }
     res.status(200).json({ msg: "Found Successfully", timetable })
   } catch (error) {
-    console.log(error)
+    
     res.status(500).json({
       error: "Internal server error"
     })
@@ -192,52 +192,29 @@ router.get("/timetable", adminAuth, async (req, res) => {
 })
 
 // Attendance
-router.get("/attenSub", adminAuth, async (req, res) => {
+
+router.get('/attendance', adminAuth , async (req,res)=>{
   try {
-    const { subjectCode } = req.query;
-    const attendance = await prisma.attendances.findMany({
-      where: { subjectCode: subjectCode },
-    });
-    if (!attendance) {
-      return res.status(401).json({
-        error: "Not found"
+      const { rollNo, subjectCode } = req.query
+      const attendance = await prisma.attendances.findMany({
+          where: {
+              studentRoll: rollNo,
+              subjectCode
+          }, 
+          select:{
+              subjectCode: true,
+              timestamp: true
+          }
       })
-    }
-
-    res.status(200).json({
-      msg: "Found Successfully",
-      attendance,
-    });
-  } catch (err) {
-
-    res.status(500).json({ error: "Internal server error" });
+      if(!attendance) return res.status(401).json({error: "Not found"})
+      res.status(200).json({attendance})
+  } catch (error) {
+     
+      res.status(500).json({ error: "Internal server error" })
   }
-});
+})
 
-router.get("/attenStudent", adminAuth, async (req, res) => {
-  try {
-    const { studentId } = req.query;
-    const attendance = await prisma.attendances.findMany({
-      where: { studentId: studentId },
-      orderBy: {
-        timestamp: 'desc'
-      }
-    });
-    if (!attendance) {
-      return res.status(401).json({
-        error: "Not found"
-      })
-    }
 
-    res.status(200).json({
-      msg: "Found successfully",
-      attendance,
-    });
-  } catch (err) {
-
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
 
 
 router.get("/studentHome", adminAuth, async (req, res) => {

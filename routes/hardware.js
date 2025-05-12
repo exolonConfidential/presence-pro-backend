@@ -1,6 +1,9 @@
 import { Router } from "express"
 import { PrismaClient } from "@prisma/client";
 import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc.js'; // Include the `.js` extension when using ES modules
+
+dayjs.extend(utc);
 const prisma = new PrismaClient();
 const router = Router();
 
@@ -67,6 +70,7 @@ router.post('/enrollmentResult', async (req, res) => {
 router.post("/markAttendance", async (req, res) => {
   try {
     const { fingerprintId } = req.body;
+    
 
     if (!fingerprintId) {
       return res.status(400).json({ error: "Fingerprint ID is required" });
@@ -99,8 +103,8 @@ router.post("/markAttendance", async (req, res) => {
     if (!timetable) {
       return res.status(404).json({ error: "No class scheduled at this time" });
     }
-
-    // 4. Prevent duplicate attendance for same subject on same date
+   
+    // 4. Prevent duplicate attendance for same subject on same class
     const startTime = timetable.startTime
     const endTime = timetable.endTime
     const [startHour, startMinute] = startTime.split(":").map(Number);
@@ -108,20 +112,21 @@ router.post("/markAttendance", async (req, res) => {
     const startDateTime = dayjs()
       .hour(startHour)
       .minute(startMinute)
-      .second(0)
+      .second(0)   
       .millisecond(0)
       .utc(); 
-
+      
+    
     const endDateTime = dayjs()
       .hour(endHour)
       .minute(endMinute)
       .second(59)
       .millisecond(999)
       .utc();
-
+ 
     const existing = await prisma.attendances.findFirst({
       where: {
-        studentId: student.id,
+        studentRoll: student.rollNo,
         subjectCode: timetable.subjectCode,
         timestamp: { // attendance only once per subject per class
           gte: startDateTime.toDate(),
@@ -137,7 +142,7 @@ router.post("/markAttendance", async (req, res) => {
     // 5. Save attendance
     const attendance = await prisma.attendances.create({
       data: {
-        studentId: student.id,
+        studentRoll: student.rollNo,
         subjectCode: timetable.subjectCode,
 
       },
@@ -145,7 +150,6 @@ router.post("/markAttendance", async (req, res) => {
 
     return res.status(200).json({
       msg: "Attendance marked successfully",
-      attendance,
     });
   } catch (err) {
     console.error(err);

@@ -83,11 +83,11 @@ model Timetable {
 
 model Attendances {
   id      String     @id @default(uuid())
-  studentId    String
+  studentRoll    String
   subjectCode   String
   
   forSubject   Subjects    @relation(fields: [subjectCode],references: [code])
-  attendie  Students  @relation(fields: [studentId], references: [id])
+  attendie  Students  @relation(fields: [studentRoll], references: [rollNo])
 
   timestamp   DateTime    @default(now())
 }

@@ -40,7 +40,7 @@ router.delete("/remove", adminAuth, async(req,res)=>{
         res.status(200).json({msg:"Deleted successfully"})
         
     } catch (error) {
-        console.log(error)
+        
         res.status(500).json({ error: "Internal server error" })
     }
 })
@@ -66,32 +66,28 @@ router.post("/signin", async (req, res) => {
     }
 })
 
-router.get("/getAll", studentAuth, async (req, res) => {
+router.get('/attendance', studentAuth, async (req,res)=>{
     try {
-        const students = await prisma.students.findMany();
-        if (!students) {
-          return  res.status(401).json({ error: "Not Found" })
-        }
-        res.status(200).json({ msg: "Found Successfully", students })
+        const { rollNo, subjectCode } = req.query
+        const attendance = await prisma.attendances.findMany({
+            where: {
+                studentRoll: rollNo,
+                subjectCode
+            },
+            select:{
+                subjectCode: true,
+                timestamp: true
+            }
+        })
+        if(!attendance) return res.status(401).json({error: "Not found"})
+        res.status(200).json({attendance})
     } catch (error) {
+        
         res.status(500).json({ error: "Internal server error" })
     }
 })
 
-router.get("/byYearAndBranch", studentAuth, async (req, res) => {
-    const { year, branch } = req.headers;
-    try {
-        const students = await prisma.students.findMany({
-            where: { year, branch }
-        })
-        if (!students) {
-         return  res.status(401).json({ error: "Not found" })
-        }
-        res.status(200).json({ msg: "Found Successfully", students })
-    } catch (error) {
-        res.status(500).json({ error: "Internal server error" })
-    }
-})
+
 
 router.get('/students', adminAuth, async (req, res) => {
     try {
