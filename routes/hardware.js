@@ -101,7 +101,7 @@ router.post("/markAttendance", async (req, res) => {
     });
 
     if (!timetable) {
-      return res.status(404).json({ error: "No class scheduled at this time" });
+      return res.status(401).json({ error: "No class scheduled at this time" });
     }
    
     // 4. Prevent duplicate attendance for same subject on same class
