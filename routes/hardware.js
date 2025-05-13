@@ -93,8 +93,7 @@ router.post("/markAttendance", async (req, res) => {
     const currentTime = now.format("HH:mm"); // 24hr format string
 
     // 3. Find matching timetable entry
-    console.log(currentDay)
-    console.log(currentTime)
+    
     const timetable = await prisma.timetable.findFirst({
       where: {
         year: student.year,
@@ -113,21 +112,20 @@ router.post("/markAttendance", async (req, res) => {
     const endTime = timetable.endTime
     const [startHour, startMinute] = startTime.split(":").map(Number);
     const [endHour, endMinute] = endTime.split(":").map(Number);
-    const startDateTime = dayjs()
+    const startDateTime = dayjs().tz("Asia/Kolkata")
       .hour(startHour)
       .minute(startMinute)
       .second(0)
       .millisecond(0)
       .utc();
 
-    const endDateTime = dayjs()
+    const endDateTime = dayjs().tz("Asia/Kolkata")
       .hour(endHour)
       .minute(endMinute)
       .second(59)
       .millisecond(999)
       .utc();
-    console.log(startDateTime.toDate());
-    console.log(endDateTime.toDate());
+    
     const existing = await prisma.attendances.findFirst({
       where: {
         studentRoll: student.rollNo,
