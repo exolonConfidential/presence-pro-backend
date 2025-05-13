@@ -91,6 +91,8 @@ router.post("/markAttendance", async (req, res) => {
     const currentTime = now.format("HH:mm"); // 24hr format string
 
     // 3. Find matching timetable entry
+    console.log(currentDay)
+    console.log(currentTime)
     const timetable = await prisma.timetable.findFirst({
       where: {
         year: student.year,
