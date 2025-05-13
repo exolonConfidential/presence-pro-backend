@@ -120,15 +120,14 @@ router.post("/markAttendance", async (req, res) => {
       .millisecond(0)
       .utc();
 
-
     const endDateTime = dayjs()
       .hour(endHour)
       .minute(endMinute)
       .second(59)
       .millisecond(999)
       .utc();
-    console.log(startDateTime.toDate);
-    console.log(endDateTime.toDate);
+    console.log(startDateTime.toDate());
+    console.log(endDateTime.toDate());
     const existing = await prisma.attendances.findFirst({
       where: {
         studentRoll: student.rollNo,
