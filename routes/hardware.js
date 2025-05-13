@@ -1,9 +1,11 @@
 import { Router } from "express"
 import { PrismaClient } from "@prisma/client";
 import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc.js'; // Include the `.js` extension when using ES modules
+import utc from 'dayjs/plugin/utc.js';
+import timezone from "dayjs/plugin/timezone.js"
 
 dayjs.extend(utc);
+dayjs.extend(timezone);
 const prisma = new PrismaClient();
 const router = Router();
 
@@ -70,7 +72,7 @@ router.post('/enrollmentResult', async (req, res) => {
 router.post("/markAttendance", async (req, res) => {
   try {
     const { fingerprintId } = req.body;
-    
+
 
     if (!fingerprintId) {
       return res.status(400).json({ error: "Fingerprint ID is required" });
@@ -86,8 +88,8 @@ router.post("/markAttendance", async (req, res) => {
     }
 
     // 2. Get current time and day
-    const now = dayjs(); // current time
-    const currentDay = now.format("dddd"); // e.g., "Monday"
+    const now = dayjs().tz("Asia/Kolkata");
+    const currentDay = now.format("dddd");     
     const currentTime = now.format("HH:mm"); // 24hr format string
 
     // 3. Find matching timetable entry
@@ -105,7 +107,7 @@ router.post("/markAttendance", async (req, res) => {
     if (!timetable) {
       return res.status(401).json({ error: "No class scheduled at this time" });
     }
-   
+
     // 4. Prevent duplicate attendance for same subject on same class
     const startTime = timetable.startTime
     const endTime = timetable.endTime
@@ -114,18 +116,18 @@ router.post("/markAttendance", async (req, res) => {
     const startDateTime = dayjs()
       .hour(startHour)
       .minute(startMinute)
-      .second(0)   
+      .second(0)
       .millisecond(0)
-      .utc(); 
-      
-    
+      .utc();
+
+
     const endDateTime = dayjs()
       .hour(endHour)
       .minute(endMinute)
       .second(59)
       .millisecond(999)
       .utc();
- 
+
     const existing = await prisma.attendances.findFirst({
       where: {
         studentRoll: student.rollNo,
