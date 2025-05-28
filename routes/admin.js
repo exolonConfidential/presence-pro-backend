@@ -50,6 +50,7 @@ router.post("/signin", async (req, res) => {
       msg: "Admin found",
     });
   } catch (err) {
+    console.log(err)
 
     res.status(500).json({ error: "Internal server error", err });
   }

@@ -61,7 +61,7 @@ router.post("/signin", async (req, res) => {
         const token = jwt.sign({ rollNo, role: "student" }, jwtPassword)
         res.status(200).json({ msg: "Found successfully", rollNo: student.rollNo , token })
     } catch (error) {
-
+        console.log(err)
         res.status(500).json({ error: "Internal server error" })
     }
 })
